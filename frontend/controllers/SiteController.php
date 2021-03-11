@@ -1,6 +1,8 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Models;
+use common\models\Vehicles;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -10,15 +12,16 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use frontend\controllers\BaseControllers\SiteController as BaseControllersSiteController;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
-
+use yii\db\ActiveRecord;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends BaseControllersSiteController
 {
     /**
      * {@inheritdoc}
@@ -74,7 +77,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $models = Models::find()->all();
+        $vehicles = Vehicles::find()->with(['vModel','user','newVehicles'])->asArray()->orderBy(['created_at' => SORT_DESC])->all();
+        return $this->render('index',[
+            'models'=>$models,
+            'vehicles'=>$vehicles
+        ]);
     }
 
     /**
@@ -142,7 +150,10 @@ class SiteController extends Controller
      */
     public function actionAbout()
     {
-        return $this->render('about');
+        $vehicles = new Vehicles();
+        return $this->render('about',[
+            'vehicles'=>$vehicles
+        ]);
     }
 
     /**

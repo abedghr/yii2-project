@@ -1,6 +1,7 @@
 html,
 body {
     height: 100%;
+    background-color: white;
 }
 
 body.blank {
@@ -14,6 +15,8 @@ body.blank {
     margin: 0 auto -60px;
     padding: 0 0 60px;
 }
+
+
 
 body.blank .wrap {
     display: flex;
@@ -137,3 +140,4 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+

@@ -1,6 +1,7 @@
 <?php
 namespace backend\controllers;
 
+use backend\controllers\BaseControllers\SiteController as BaseControllersSiteController;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -10,7 +11,7 @@ use common\models\LoginForm;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends BaseControllersSiteController
 {
     /**
      * {@inheritdoc}
@@ -19,7 +20,7 @@ class SiteController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'actions' => ['login', 'error'],
@@ -33,7 +34,7 @@ class SiteController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
                 ],
@@ -62,7 +63,9 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
-
+    public function actionCc(){
+        return $this->render('index');
+    }
     /**
      * Login action.
      *
@@ -70,6 +73,7 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $this->layout = "login";
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }

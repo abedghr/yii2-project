@@ -20,10 +20,14 @@ AssetsAdminLteAsset::register($this);
     <?php $this->head() ?>
 </head>
 <body class="login-page">
-
 <?php $this->beginBody() ?>
+<div class="panel-default">
+    <div class="panel-body">
+        <?= $content ?>
+    </div>
+</div>
 
-    <?= $content ?>
+
 
 <?php $this->endBody() ?>
 </body>

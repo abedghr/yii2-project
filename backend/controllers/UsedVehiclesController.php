@@ -34,7 +34,7 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index','create','update','view'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -44,7 +44,6 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                    'logout' => ['POST'],
                 ],
             ],
         ];

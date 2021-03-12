@@ -6,6 +6,7 @@ use backend\controllers\BaseControllers\CityController as BaseControllersCityCon
 use Yii;
 use common\models\City;
 use common\models\CitySearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -23,13 +24,14 @@ class CityController extends BaseControllersCityController
         return [
             'access' => [
                 'class' => AccessControl::class,
+                'only' => ['create', 'update','delete','view'],
                 'rules' => [
                     [
                         'actions' => ['login', 'error'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index','create','update','view'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

@@ -33,7 +33,7 @@ class NewVehiclesController extends BaseControllersNewVehiclesController
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index','create','update','view'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -43,7 +43,6 @@ class NewVehiclesController extends BaseControllersNewVehiclesController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                    'logout' => ['POST'],
                 ],
             ],
         ];

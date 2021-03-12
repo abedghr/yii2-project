@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
         <div class="row">
             <div class="col-md-6">
             <?= $form->field($vehicle,'v_model_id')->widget(DepDrop::class,[
-                            'options'=>['id'=>'v_model_id'],
+                            'options'=>['id'=>'v_model_id',],
                             'pluginOptions'=>[
                                 'depends'=>['v_make_id'],
                                 'initialize'=>true,

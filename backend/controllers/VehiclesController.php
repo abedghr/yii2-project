@@ -31,7 +31,7 @@ class VehiclesController extends BaseControllersVehiclesController
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index','create','update','view'],
+                        'actions' => ['logout', 'index','create','update','view','lists'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

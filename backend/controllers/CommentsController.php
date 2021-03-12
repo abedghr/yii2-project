@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use backend\controllers\BaseControllers\CommentsController as BaseControllersCommentsController;
+use yii\filters\AccessControl;
 
 /**
  * CommentsController implements the CRUD actions for Comments model.
@@ -21,10 +22,25 @@ class CommentsController extends BaseControllersCommentsController
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -53,8 +69,9 @@ class CommentsController extends BaseControllersCommentsController
      */
     public function actionView($id)
     {
+        $comment = Comments::find()->where(['id'=>$id])->with('user','vehicle')->all();
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $comment[0]
         ]);
     }
 
@@ -83,7 +100,8 @@ class CommentsController extends BaseControllersCommentsController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+
+    /* public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
@@ -94,7 +112,7 @@ class CommentsController extends BaseControllersCommentsController
         return $this->render('update', [
             'model' => $model,
         ]);
-    }
+    } */
 
     /**
      * Deletes an existing Comments model.

@@ -3,12 +3,17 @@
 namespace backend\controllers;
 
 use backend\controllers\BaseControllers\UsedVehiclesController as BaseControllersUsedVehiclesController;
+use common\models\NewVehicles;
 use Yii;
 use common\models\UsedVehicles;
 use common\models\UsedVehiclesSearch;
+use common\models\Vehicles;
+use common\models\VehiclesSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * UsedVehiclesController implements the CRUD actions for UsedVehicles model.
@@ -21,10 +26,25 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'logout' => ['POST'],
                 ],
             ],
         ];
@@ -36,9 +56,8 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
      */
     public function actionIndex()
     {
-        $searchModel = new UsedVehiclesSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
+        $searchModel = new VehiclesSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams,'old');
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -53,8 +72,9 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
      */
     public function actionView($id)
     {
+        $vehicle = Vehicles::find()->where(['id'=>$id])->with('usedVehicles','usedVehicles.vCity','usedVehicles.vMileage')->all();
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $vehicle[0],
         ]);
     }
 
@@ -65,14 +85,32 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
      */
     public function actionCreate()
     {
-        $model = new UsedVehicles();
+        $vehicle = new Vehicles(['scenario'=>Vehicles::SCENARIO_CREATE]);
+        $usedVehicle = new UsedVehicles();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($vehicle->load(Yii::$app->request->post())) {
+            if($usedVehicle->load(Yii::$app->request->post())){
+                $vehicle->imageFile = UploadedFile::getInstance($vehicle,'imageFile');
+                $vehicle->main_image = time().$vehicle->imageFile;
+                $vehicle->created_at = time();
+                $vehicle->updated_at = time();
+                $usedVehicle->v_year = $vehicle->manufacturing_year;
+                $valid1 = $vehicle->validate();
+                $valid2 = $usedVehicle->validate();
+                if($valid1 && $valid2 && $vehicle->save()){
+                    $vehicle->imageFile->saveAs(Yii::getAlias('uploads/vehicles_images').'/'.$vehicle->main_image);
+                    $usedVehicle->v_id = $vehicle->id;
+                    if($usedVehicle->save()){
+                        return $this->redirect(['view', 'id' => $vehicle->id]);
+                    }
+                }
+            }
+           
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'vehicle' => $vehicle,
+            'usedVehicle' => $usedVehicle
         ]);
     }
 
@@ -85,14 +123,52 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $vehicle = Vehicles::findOne($id);
+        $vehicle->scenario = "update";
+        $used = UsedVehicles::find()->where(['v_id'=>$id])->all();
+        $usedVehicle = UsedVehicles::findOne($used[0]->id);
+        $curr_image = $vehicle->main_image;
+        if ($vehicle->load(Yii::$app->request->post())) {
+            if($usedVehicle->load(Yii::$app->request->post())){
+                $vehicle->imageFile = UploadedFile::getInstance($vehicle,'imageFile');
+                $vehicle->created_at = time();
+                $vehicle->updated_at = time();
+                if(!empty($vehicle->imageFile)){
+                    $vehicle->main_image = $vehicle->imageFile;
+                    $imageName = $vehicle->main_image;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+                    $valid1 = $vehicle->validate();
+                    $valid2 = $usedVehicle->validate();
+                    if($valid1 && $valid2 && $vehicle->save()){
+                        
+                        $usedVehicle->v_id = $vehicle->id;
+                        
+                        $vehicle->imageFile->saveAs(Yii::getAlias('uploads/vehicles_images/').$imageName);
+                        if($usedVehicle->save()){
+                            return $this->redirect(['view', 'id' => $vehicle->id]);
+                        }
+                    }
+                }else{
+                    $vehicle->main_image = $curr_image;
+                    $imageName = $vehicle->main_image;
+                    $valid1 = $vehicle->validate();
+                    $valid2 = $usedVehicle->validate();
+                    if($valid1 && $valid2 && $vehicle->save()){
+                        
+                        $usedVehicle->v_id = $vehicle->id;
+                        
+                        if($usedVehicle->save()){
+                            return $this->redirect(['view', 'id' => $vehicle->id]);
+                        }
+                    }
+                }
+            }
+            return $this->redirect(['view', 'id' => $vehicle->id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'vehicle' => $vehicle,
+            'usedVehicle'=>$usedVehicle
         ]);
     }
 
@@ -105,7 +181,7 @@ class UsedVehiclesController extends BaseControllersUsedVehiclesController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model=Vehicles::findOne($id)->delete();
 
         return $this->redirect(['index']);
     }

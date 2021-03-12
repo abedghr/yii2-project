@@ -8,6 +8,7 @@ use common\models\NewVehicles;
 use common\models\NewVehiclesSearch;
 use common\models\Vehicles;
 use common\models\VehiclesSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -24,10 +25,25 @@ class NewVehiclesController extends BaseControllersNewVehiclesController
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'logout' => ['POST'],
                 ],
             ],
         ];
@@ -126,7 +142,7 @@ class NewVehiclesController extends BaseControllersNewVehiclesController
                     $imageName = $vehicles->main_image;
 
                     $valid1 = $vehicles->validate();
-                    $valid2 = $vehicles->validate();
+                    $valid2 = $newVehicle->validate();
                     if($valid1 && $valid2 && $vehicles->save()){
                         
                     $newVehicle->v_id = $vehicles->id;
@@ -141,7 +157,7 @@ class NewVehiclesController extends BaseControllersNewVehiclesController
                     $vehicles->main_image = $curr_image;
                     $imageName = $vehicles->main_image;
                     $valid1 = $vehicles->validate();
-                    $valid2 = $vehicles->validate();
+                    $valid2 = $newVehicle->validate();
                     if($valid1 && $valid2 && $vehicles->save()){
                         
                         $newVehicle->v_id = $vehicles->id;

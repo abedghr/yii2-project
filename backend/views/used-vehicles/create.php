@@ -11,10 +11,10 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="used-vehicles-create">
 
-    <h1><?= Html::encode($this->title) ?></h1>
 
     <?= $this->render('_form', [
-        'model' => $model,
+        'vehicle' => $vehicle,
+        'usedVehicle'=>$usedVehicle
     ]) ?>
 
 </div>

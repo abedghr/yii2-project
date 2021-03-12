@@ -85,13 +85,13 @@ use yii\helpers\Html;
               <!-- User Account: style can be found in dropdown.less -->
               <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-					<?= Html::img('@web/img/user2-160x160.jpg', ['class' => 'user-image', 'alt'=>'User Image']) ?>
+					<?= Html::img('https://www.clipartkey.com/mpngs/m/237-2374286_administrator-network-icons-system-avatar-computer-admin-icon.png', ['class' => 'user-image', 'alt'=>'User Image']) ?>
                   <span class="hidden-xs"><?php echo Yii::$app->user->identity->username ?></span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- User image -->
                   <li class="user-header">
-                    <?= Html::img('@web/img/user2-160x160.jpg', ['class' => 'img-circle', 'alt'=>'User Image']) ?>
+                    <?= Html::img('https://www.clipartkey.com/mpngs/m/237-2374286_administrator-network-icons-system-avatar-computer-admin-icon.png', ['class' => 'img-circle', 'alt'=>'User Image']) ?>
                     <p>
                       <?php echo Yii::$app->user->identity->email ?>
                       <small>Member since Nov. 2021</small>
@@ -103,7 +103,7 @@ use yii\helpers\Html;
                       <a href="#" class="btn btn-default btn-flat">Profile</a>
                     </div>
                     <div class="pull-right">
-                      <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                      <?= HTML::a('Logout','/site/logout',['data-method' => 'POST','class'=>'btn btn-default btn-flat'])?>
                     </div>
                   </li>
                 </ul>
